@@ -1,8 +1,7 @@
 import cv2
 import os
 from vehicle_detection import detect_vehicle
-from plate_detection import detect_plate
-from ocr_recognition import recognize_plate
+from plate_detection import detect_and_recognize_plate  # Atualizando para usar a nova função com OpenALPR
 
 # Caminhos para os arquivos do YOLO
 yolo_cfg = r'C:\yolo\yolov4-tiny.cfg'
@@ -26,21 +25,13 @@ vehicle_img, vehicle_coords = detect_vehicle(image, yolo_cfg, yolo_weights)
 if vehicle_img is not None:
     print("Veículo detectado.")
 
-    # Detectar a placa no veículo
-    plate_img, plate_coords = detect_plate(vehicle_img, yolo_cfg, yolo_weights)
+    # Detectar e reconhecer a placa no veículo usando OpenALPR e pré-processamento
+    plate_text = detect_and_recognize_plate(vehicle_img)
 
-    # Se uma placa foi detectada
-    if plate_img is not None:
-        print("Placa detectada.")
-        
-        # Reconhecimento OCR na placa
-        plate_text = recognize_plate(plate_img)
-        
-        if plate_text:
-            print(f"Texto da placa: {plate_text}")
-        else:
-            print("Erro ao reconhecer a placa.")
+    # Se uma placa foi reconhecida
+    if plate_text:
+        print(f"Placa reconhecida: {plate_text}")
     else:
-        print("Nenhuma placa detectada.")
+        print("Nenhuma placa reconhecida.")
 else:
     print("Nenhum veículo detectado.")
